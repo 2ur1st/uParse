@@ -4,6 +4,7 @@
  *
  */
 var file = require("./file").create();
+var logger = require("./logger").create();
 var config = require("./config").getConfig();
 var paginator = require("./paginator").create();
 
@@ -19,22 +20,16 @@ Grab.prototype.TAG_CAT_PAGE = 'div.category';
  */
 Grab.prototype.TAG_PROD_PAGE = 'div.product';
 
-
-Grab.prototype.sleep = false;
+Grab.prototype.products = [];
 
 /**
  * init require function route
  */
 Grab.prototype.route = function() {
-    console.log('Run route function');
+    logger.add('-- Run Route --');
     try {
-
-        if(this.sleep) {
-            return false;
-        }
-
         if(this.isCategoryPage()) {
-            console.log('get categories');
+            logger.add('get categories');
             var categories = this.getCategories();
             //file.writeJson(config.result_file, categories, 'a');
             for (var i = 0; i < categories.length; i++) {
@@ -44,15 +39,17 @@ Grab.prototype.route = function() {
             }
         }
 
-        var content = this.getProducts();
-        file.stringify(config.result_file, content, 'a');
-        this.close();
-        //
+        this.getProducts();
         //this.close();
     } catch(err) {
-        console.log(err);
-        this.close();
+        logger.add(err);
+        this.exit();
     }
+};
+
+Grab.prototype.initCustomEvent = function() {
+    paginator.init(this);
+    logger.init(config.debug);
 };
 
 //Grab.prototype.getCategories = function() {
@@ -73,19 +70,16 @@ Grab.prototype.isCategoryPage = function() {
  *
  */
 Grab.prototype.getProducts = function() {
-    this.sleep = true;
-    paginator.init(this);
-
     var products = this.getProduct();
-    if(!paginator.exist()) {
-        return products;
+    if(products.length) {
+        file.stringify(config.result_file, products, 'a');
     }
+    if(paginator.exist() && paginator.nextPageExist()) {
+        logger.add('Next page');
+        paginator.nextPage();
+    }
+    //_paginator.nextPage();
 
-    while(paginator.nextPageExist()) {
-        slimer.wait(2000);
-        console.log(' --- next page --- ');
-        //paginator.nextPage();
-    }
 };
 
 /**
@@ -100,7 +94,6 @@ Grab.prototype.getProduct = function() {
             var product = {
                 'name': $product.find('h2 > a').text().trim().toLowerCase(),
                 'url': $product.find('h2 > a').attr('href')
-                //'image': jQuery(value).find('a.img > img').attr('src')
             };
             products.push(product);
         });

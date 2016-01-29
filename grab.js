@@ -3,7 +3,6 @@
  *
  *
  */
-
 function Grab() {
 
     /**
@@ -22,6 +21,9 @@ function Grab() {
     this.init = function() {
         this._page = require("webpage").create();
         this.initCallbacks();
+        if (typeof this.initCustomEvent === 'function') {
+            this.initCustomEvent();
+        }
     };
 
     /**
@@ -57,6 +59,7 @@ function Grab() {
      * close webpage object
      */
     this.close = function() {
+        console.log('-- Close page --');
         this._page.close();
 
     };
@@ -85,15 +88,16 @@ function Grab() {
         var self = this;
 
         this._page.onError = function (message, stack) {
-            console.log(message);
+            console.log('-- error message -- ' + message);
         };
 
         this._page.onUrlChanged = function (url) {
             self.currentUrl = url;
+            console.log('currentUrl = '+self.currentUrl);
         };
 
         this._page.onConsoleMessage = function (message, line, file) {
-            console.log(message);                       
+            console.log('-- console message -- ' + message);
         };
 
         this._page.onLoadFinished = function(status) {

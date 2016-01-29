@@ -1,15 +1,30 @@
 /**
  *
+ * Object for effective working with the pagintaion
  *
  */
 function Paginator() {
 
+    /**
+     * @type {string} DOM element contain pagination button
+     */
     this.TAG_PAGINATION = '.pagination';
 
+    /**
+     * @type {string} DOM link or button for click on the next page
+     */
     this.TAG_PAGINATION_NEXT = '.pagination .pagination-next a';
 
+    /**
+     * Object Grab for working on the actuall page
+     * @private
+     */
     this._grab = null;
 
+    /**
+     * init object
+     * @param grab {object} Grab Object
+     */
     this.init = function(grab) {
         this._grab = grab;
     };
@@ -40,16 +55,13 @@ function Paginator() {
      */
     this.nextPage = function() {
         var url = this._grab.evaluate(function(tag) {
-            if(!jQuery(tag).length) {
-                console.log('It is last page in this categories');
-                return false;
-            }
             return jQuery(tag).attr('href');
         }, this.TAG_PAGINATION_NEXT);
 
-        if(url) {
-            this._grab.open(url);
+        if(!url) {
+            throw new Error('URL not found ('+url+')');
         }
+        this._grab.open(url);
     };
 
 }
