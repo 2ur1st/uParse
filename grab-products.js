@@ -20,26 +20,27 @@ Grab.prototype.TAG_CAT_PAGE = 'div.category';
  */
 Grab.prototype.TAG_PROD_PAGE = 'div.product';
 
-Grab.prototype.products = [];
+Grab.prototype._sleep = false;
+
+Grab.prototype._categories = [];
 
 /**
  * init require function route
  */
 Grab.prototype.route = function() {
-    logger.add('-- Run Route --');
     try {
         if(this.isCategoryPage()) {
             logger.add('get categories');
-            var categories = this.getCategories();
-            //file.writeJson(config.result_file, categories, 'a');
-            for (var i = 0; i < categories.length; i++) {
-                var url = categories[i].url_article;
-                new Grab().init(url, categories[i].title);
-                slimer.wait(3000);
-            }
+            this._categories = this.getCategories();
+            setInterval(function() {
+                Grab.prototype.scheduler();
+            }, 1000);
         }
 
-        this.getProducts();
+        if(!this.isCategoryPage()) {
+            logger.add('get page product');
+            this.getProducts();
+        }
         //this.close();
     } catch(err) {
         logger.add(err);
@@ -47,23 +48,62 @@ Grab.prototype.route = function() {
     }
 };
 
+/**
+ * TODO it is not work !!!
+ */
+Grab.prototype.scheduler = function() {
+    console.log(!!this._sleep);
+    if(!this._categories.length && this._sleep) {
+        return;
+    }
+    var category = this._categories.shift();
+    Grab.sleep(true);
+    logger.add('Open page category ' + category.name);
+    Grab.open(category.url);
+};
+
 Grab.prototype.initCustomEvent = function() {
     paginator.init(this);
     logger.init(config.debug);
 };
 
-//Grab.prototype.getCategories = function() {
-//    return this.getContent('categories')
-//};
-//
+/**
+ *
+ * @returns {*}
+ */
+Grab.prototype.getCategories = function() {
+    var categories = this._page.evaluate(function(tag) {
+        var categories = [];
+        jQuery(tag).each(function(key, value) {
+            var $category = jQuery(value);
+            var category = {
+                'type': 'category',
+                'name': $category.find('h2 > a').text().trim().toLowerCase(),
+                'url': $category.find('h2 > a').attr('href')
+            };
+            categories.push(category);
+        });
+        return categories;
+    }, this.TAG_CAT_PAGE);
+
+    if(categories.length) {
+        file.stringify(config.result_file, categories, 'a');
+    }
+    return categories;
+};
+
 /**
  * check is a categories page
  * @returns bool
  */
 Grab.prototype.isCategoryPage = function() {
     return this._page.evaluate(function(tag) {
-        return jQuery(tag).length;
+        return !!jQuery(tag).length;
     }, this.TAG_CAT_PAGE);
+};
+
+Grab.prototype.sleep = function(status) {
+    this._sleep = !!status;
 };
 
 /**
@@ -77,8 +117,10 @@ Grab.prototype.getProducts = function() {
     if(paginator.exist() && paginator.nextPageExist()) {
         logger.add('Next page');
         paginator.nextPage();
+    } else {
+        this.sleep(false);
+        logger.add(this._sleep);
     }
-    //_paginator.nextPage();
 
 };
 
@@ -92,6 +134,7 @@ Grab.prototype.getProduct = function() {
         jQuery(tag).each(function(key, value) {
             var $product = jQuery(value); //.find('a.name');
             var product = {
+                'type': 'product',
                 'name': $product.find('h2 > a').text().trim().toLowerCase(),
                 'url': $product.find('h2 > a').attr('href')
             };
