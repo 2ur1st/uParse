@@ -3,7 +3,7 @@
  * Endpoint file
  *
  */
-var url = 'http://wolta.ru/catalog/interernyj-svet/lyustry';
+var url = 'http://wolta.ru/catalog/interernyj-svet';
 var grab = require('./grab-products').create();
 grab.init();
 grab.setPageOptions('host', 'http://wolta.ru');
