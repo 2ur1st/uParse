@@ -18,12 +18,14 @@ function Grab() {
     /**
      * init object
      */
-    this.init = function() {
+    this.init = function(Parser) {
         this._page = require("webpage").create();
+        this._Parser = Parser;
         this.initCallbacks();
-        if (typeof this.initCustomEvent === 'function') {
-            this.initCustomEvent();
+        if (typeof this.initUtils === 'function') {
+            this.initUtils();
         }
+        return this;
     };
 
     /**
@@ -95,6 +97,6 @@ function Grab() {
     };
 }
 
-exports.init = function() {
-    return Grab;
+exports.create = function() {
+    return new Grab();
 };

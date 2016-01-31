@@ -7,7 +7,7 @@ var Config = function() {
     /**
      * @type {string} root url for starting parse
      */
-    this.url = 'http://wolta.ru/catalog/svetovye-resheniya/svetodiodnye-lampy';
+    this.url = 'http://wolta.ru/catalog/svet-dlya-sada';
 
     this.viewportSize = {width: 480, height: 800};
 
