@@ -4,11 +4,26 @@
  *
  */
 var Config = function() {
+    /**
+     * @type {string} root url for starting parse
+     */
+    this.url = 'http://wolta.ru/catalog/svetovye-resheniya/svetodiodnye-lampy';
+
+    this.viewportSize = {width: 480, height: 800};
+
     this.log_path = 'logs\\error.txt';
     this.result_file = 'result\\result.txt';
     this.debug = true;
 };
 
-exports.getConfig = function() {
+Config.prototype.set = function(key, value) {
+    this[key] = value;
+};
+
+Config.prototype.get = function(key) {
+    return this[key];
+};
+
+exports.create = function() {
     return new Config();
 };

@@ -3,9 +3,7 @@
  * Endpoint file
  *
  */
-var url = 'http://example.com/';
-var grab = require('./grab-products').create();
+var grab = require('./class/Fabrica').create();
 grab.init();
-grab.setPageOptions('host', 'http://example.com');
-grab.setPageOptions('viewportSize', {width: 480, height: 800});
-grab.open(url);
+//grab.setPageOptions('host', 'http://wolta.ru');
+//grab.open(url);
