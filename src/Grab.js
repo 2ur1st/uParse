@@ -3,7 +3,11 @@
  * Main class for Parsing data
  *
  */
+var Config = require("./Config").create();
+
 function Grab() {
+
+    this.name = null;
 
     /**
      * variable for safe webpage object
@@ -18,9 +22,8 @@ function Grab() {
     /**
      * init object
      */
-    this.init = function(Parser) {
+    this.init = function() {
         this._page = require("webpage").create();
-        this._Parser = Parser;
         this.initCallbacks();
         if (typeof this.initUtils === 'function') {
             this.initUtils();
@@ -34,7 +37,7 @@ function Grab() {
      */
     this.open = function(url) {
         if(!url.match(/^http/i)) {
-            url = this.getPageOption('host') + url;
+            url = Config.get('host') + url;
         }
         this._page.open(url);
     };

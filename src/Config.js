@@ -3,27 +3,74 @@
  * CONFIGURE FILE
  *
  */
-var Config = function() {
+
+var Singleton;
+(function() {
+
+    var instance;
+
+    Singleton = function() {
+        if(instance) {
+            return instance;
+        }
+        instance = this;
+    };
+
+    Singleton.prototype._urls = [];
+
+    Singleton.prototype.push = function(url) {
+        this._urls.push(url);
+    };
+
+    Singleton.prototype.pop = function() {
+        this._urls.pop();
+    };
+
+    Singleton.prototype.host = 'http://wolta.ru/';
+
     /**
-     * @type {string} root url for starting parse
+     * options for slimerJs objetc
+     * @type {{viewportSize: {width: number, height: number}}}
      */
-    this.url = 'http://wolta.ru/catalog/svet-dlya-sada';
+    Singleton.prototype.slimer = {
+        viewportSize: {width: 480, height: 800}
+    };
 
-    this.viewportSize = {width: 480, height: 800};
+    /**
+     * @type {string} path to log file
+     */
+    Singleton.prototype.logPath = 'logs\\error.txt';
 
-    this.log_path = 'logs\\error.txt';
-    this.result_file = 'result\\result.txt';
-    this.debug = true;
-};
+    /**
+     * @type {string} path to result file
+     */
+    Singleton.prototype.resultFile = 'result\\result.txt';
 
-Config.prototype.set = function(key, value) {
-    this[key] = value;
-};
+    /**
+     * @type {boolean} key for debug
+     */
+    Singleton.prototype.debug = true;
 
-Config.prototype.get = function(key) {
-    return this[key];
-};
+    /**
+     * set param
+     * @param key
+     * @param value
+     */
+    Singleton.prototype.set = function(key, value) {
+        this[key] = value;
+    };
+
+    /**
+     * get param
+     * @param key
+     * @returns {*}
+     */
+    Singleton.prototype.get = function(key) {
+        return this[key];
+    };
+
+})();
 
 exports.create = function() {
-    return new Config();
+    return new Singleton();
 };

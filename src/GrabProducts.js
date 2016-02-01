@@ -3,8 +3,10 @@
  *  this file extends object Grap for custom website
  *
  */
-var Grab = require("./grab").create();
+var Grab = require("./Grab").create();
 var Paginator = require("./Paginator").create();
+var Config = require("./Config").create();
+var File = require("./File").create();
 
 function GrabProducts() {
     /**
@@ -28,16 +30,11 @@ function GrabProducts() {
     this.getProducts = function() {
         var products = this.getProduct();
         if(products.length) {
-            file.stringify(config.result_file, products, 'a');
+            File.stringify(Config.get('resultFile'), products, 'a');
         }
-        if(paginator.exist() && paginator.nextPageExist()) {
-            logger.add('Next page');
-            paginator.nextPage();
-        } else {
-            this.sleep(false);
-            logger.add(this._sleep);
+        if(Paginator.exist() && Paginator.nextPageExist()) {
+            Paginator.nextPage();
         }
-
     };
 
     /**
@@ -68,8 +65,8 @@ function GrabProducts() {
             if(!this.isset()) {
                 return false;
             }
-            console.add('get categories');
-            return this._get();
+            console.log('get products');
+            return this.getProducts();
 
         } catch(err) {
             console.log(err);
@@ -82,37 +79,9 @@ function GrabProducts() {
         //logger.init(config.debug);
     };
 
-    /**
-     * init require function route
-     */
-    this.route = function() {
-        try {
-            if(!this.isset()) {
-                return false;
-            }
-            console.add('get product');
-            return this._get();
-
-        } catch(err) {
-            console.log(err);
-            this.exit();
-        }
-    }
 }
 
-
-
-
-
-
 GrabProducts.prototype = Grab;
-
-
-//Grab.prototype.sleep = function(status) {
-//    this._sleep = !!status;
-//};
-
-
 
 
 /**

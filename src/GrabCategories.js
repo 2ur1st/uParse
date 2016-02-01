@@ -2,7 +2,9 @@
  *
  * @constructor
  */
-var Grab = require("./grab").create();
+var Grab = require("./Grab").create();
+var Config = require("./Config").create();
+var File = require("./File").create();
 
 function GrabCategories() {
     /**
@@ -24,7 +26,7 @@ function GrabCategories() {
      * get categories from page
      * @returns {*}
      */
-    this._get = function() {
+    this.getCategories = function() {
         var categories = this._page.evaluate(function(tag) {
             var categories = [];
             jQuery(tag).each(function(key, value) {
@@ -40,13 +42,13 @@ function GrabCategories() {
             return categories;
         }, this.TAG_CAT_PAGE);
 
-        //if(categories.length) {
-        //    file.stringify(config.result_file, categories, 'a');
-        //}
-        console.log(categories.length);
+        if(categories.length) {
+            File.stringify(Config.get('resultFile'), categories, 'a');
+        }
+        //console.log(categories.length);
         categories.forEach(function(key, value) {
-           console.log(key);
-            console.log(value);
+            console.log('add URl '+value.url);
+            require.globals.urls.push(value.url);
         });
         //return categories;
 
@@ -61,13 +63,14 @@ function GrabCategories() {
                 return false;
             }
             console.log('get categories');
-            return this._get();
+            this.getCategories();
 
         } catch(err) {
             console.log(err);
             this.exit();
         }
     }
+
 }
 
 GrabCategories.prototype = Grab;
